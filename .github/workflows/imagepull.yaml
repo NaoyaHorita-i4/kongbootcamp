@@ -35,8 +35,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y wget
-        wget -O trivy_0.21.2_Linux-64bit.deb https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.21.2_Linux-64bit.deb
-        sudo dpkg -i trivy_0.21.2_Linux-64bit.deb
+        wget -O trivy_latest.deb https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.62.1_Linux-64bit.deb
+        sudo dpkg -i trivy_latest.deb
 
     - name: Run Trivy scan
       id: trivy
