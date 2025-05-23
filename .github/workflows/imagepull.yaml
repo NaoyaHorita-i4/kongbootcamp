@@ -46,9 +46,8 @@ jobs:
 
     - name: Check for vulnerabilities
       run: |
-        high_vulns=$(grep -o "HIGH: [0-9]*" trivy_report.txt | awk '{print $2}')
-        critical_vulns=$(grep -o "CRITICAL: [0-9]*" trivy_report.txt | awk '{print $2}')
-        if [[ "$high_vulns" == "0" && "$critical_vulns" == "0" ]]; then
+        last_line=$(tail -n 1 trivy_report.txt)
+        if [[ "$last_line" == *"'0': Clean"* ]]; then
           echo "No vulnerabilities found."
         else
           echo "Vulnerabilities found, deleting image..."
