@@ -44,10 +44,9 @@ jobs:
 
     - name: Check for vulnerabilities
       run: |
-        vulnerabilities=$(trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:latest)
-        total_high=$(echo "$vulnerabilities" | grep -o "HIGH: [0-9]*" | awk '{print $2}')
-        total_critical=$(echo "$vulnerabilities" | grep -o "CRITICAL: [0-9]*" | awk '{print $2}')
-        if [[ "$total_high" == "0" && "$total_critical" == "0" ]]; then
+        high_vulns=$(grep -o "HIGH: [0-9]*" trivy_report.txt | awk '{print $2}')
+        critical_vulns=$(grep -o "CRITICAL: [0-9]*" trivy_report.txt | awk '{print $2}')
+        if [[ "$high_vulns" == "0" && "$critical_vulns" == "0" ]]; then
           echo "No vulnerabilities found."
         else
           echo "Vulnerabilities found, deleting image..."
