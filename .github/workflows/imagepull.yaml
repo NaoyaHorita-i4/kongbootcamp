@@ -40,7 +40,9 @@ jobs:
 
     - name: Run Trivy scan
       id: trivy
-      run: trivy image ghcr.io/naoyahorita-i4/kong:latest
+      run: |
+        trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:latest > trivy_report.txt
+        cat trivy_report.txt
 
     - name: Check for vulnerabilities
       run: |
