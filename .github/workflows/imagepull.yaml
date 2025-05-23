@@ -23,27 +23,27 @@ jobs:
       run: docker pull kong/kong:latest
 
     - name: Log in to GHCR
-      run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u NaoyaHorita-i4 --password-stdin
+      run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin
 
     - name: Tag Docker image
-      run: docker tag kong/kong:latest ghcr.io/NaoyaHorita-i4/kong:latest
+      run: docker tag kong/kong:latest ghcr.io/naoyahorita-i4/kong:latest
 
     - name: Push Docker image to GHCR
-      run: docker push ghcr.io/NaoyaHorita-i4/kong:latest
+      run: docker push ghcr.io/naoyahorita-i4/kong:latest
 
     - name: Install Trivy
       run: sudo apt-get install -y wget && wget -qO- https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.21.2_Linux-64bit.deb | sudo dpkg -i -
 
     - name: Run Trivy scan
       id: trivy
-      run: trivy image ghcr.io/NaoyaHorita-i4/kong:latest
+      run: trivy image ghcr.io/naoyahorita-i4/kong:latest
 
     - name: Check for vulnerabilities
       run: |
-        vulnerabilities=$(trivy image --quiet --severity HIGH,CRITICAL ghcr.io/NaoyaHorita-i4/kong:latest | grep "Total: 0" || true)
+        vulnerabilities=$(trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:latest | grep "Total: 0" || true)
         if [[ "$vulnerabilities" == "" ]]; then
           echo "Vulnerabilities found, deleting image..."
-          docker rmi ghcr.io/NaoyaHorita-i4/kong:latest || true
+          docker rmi ghcr.io/naoyahorita-i4/kong:latest || true
           exit 1
         else
           echo "No vulnerabilities found."
