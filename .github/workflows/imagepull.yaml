@@ -26,7 +26,7 @@ jobs:
       run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin
 
     - name: Tag Docker image
-      run: docker tag kong/kong:latest ghcr.io/naoyahorita-i4/kong:latest
+      run: docker tag kong/kong-gateway:latest ghcr.io/naoyahorita-i4/kong:latest
 
     - name: Push Docker image to GHCR
       run: docker push ghcr.io/naoyahorita-i4/kong:latest
