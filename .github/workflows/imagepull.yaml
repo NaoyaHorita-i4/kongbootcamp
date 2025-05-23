@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Pull Docker image
-      run: docker pull kong/kong:latest
+      run: docker pull kong/kong-gateway:latest
 
     - name: Log in to GHCR
       run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin
