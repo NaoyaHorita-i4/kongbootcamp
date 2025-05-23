@@ -1,0 +1,10 @@
+.azure/
+.cache/
+.config/
+.docker/
+.kube/
+.local/
+.ssh/
+.bash_history
+.bashrc
+mise.toml
