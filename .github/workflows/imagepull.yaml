@@ -20,16 +20,16 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Pull Docker image
-      run: docker pull kong/kong-gateway:latest
+      run: docker pull kong/kong-gateway:3.10.0.2-20250520-ubuntu
 
     - name: Log in to GHCR
       run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin
 
     - name: Tag Docker image
-      run: docker tag kong/kong-gateway:latest ghcr.io/naoyahorita-i4/kong:latest
+      run: docker tag kong/kong-gateway:3.10.0.2-20250520-ubuntu ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu
 
     - name: Push Docker image to GHCR
-      run: docker push ghcr.io/naoyahorita-i4/kong:latest
+      run: docker push ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu
 
     - name: Install Trivy
       run: |
@@ -41,7 +41,7 @@ jobs:
     - name: Run Trivy scan
       id: trivy
       run: |
-        trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:latest > trivy_report.txt
+        trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu > trivy_report.txt
         cat trivy_report.txt
 
     - name: Check for vulnerabilities
@@ -51,6 +51,6 @@ jobs:
           echo "No vulnerabilities found."
         else
           echo "Vulnerabilities found, deleting image..."
-          docker rmi ghcr.io/naoyahorita-i4/kong:latest || true
+          docker rmi ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu || true
           exit 1
         fi
