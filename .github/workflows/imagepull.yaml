@@ -6,8 +6,12 @@ on:
       - main  # メインブランチにPushされた場合フローをキック
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        platform:
+          - linux/arm64
 
     steps:
     - name: Set up Docker Buildx
