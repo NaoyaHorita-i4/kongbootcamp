@@ -1,8 +1,8 @@
 image:
-  repository: ghcr.io/naoyahorita-i4/kong
-  tag: "3.10.0.2-20250520-ubuntu"
+  repository: ghcr.io/naoyahorita-i4/kong # GHCRを指定
+  tag: "3.10.0.2-20250520-ubuntu" # 自分で付与したtagを指定
   imagePullSecrets:
-    - name: regcred 
+    - name: regcred  # GHCRに接続するためのsecretをkubectlで作成しておく
 
 secretVolumes:
 - kong-cluster-cert
@@ -40,12 +40,12 @@ resources:
     cpu: 1
     memory: "2Gi"
 
-serviceMonitor:
+serviceMonitor: # prometheusとの接続
   enabled: true
   labels:
     release: prometheus-stack
 
-status:
+status: # health checkの有効化
   enabled: true
   http:
     enabled: true

@@ -1,0 +1,299 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: kongbc
+consumers:
+- keyauth_credentials:
+  - key: poc_key
+  username: poc_consumer
+plugins:
+- config:
+    ai_metrics: false
+    bandwidth_metrics: true
+    latency_metrics: true
+    per_consumer: true
+    status_code_metrics: true
+    upstream_health_metrics: true
+    wasm_metrics: false
+  enabled: true
+  name: prometheus
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - latest
+- config:
+    compound_identifier: null
+    consumer_groups: null
+    dictionary_name: kong_rate_limiting_counters
+    disable_penalty: false
+    enforce_consumer_groups: false
+    error_code: 429
+    error_message: API rate limit exceeded
+    header_name: null
+    hide_client_headers: false
+    identifier: ip
+    limit:
+    - 100
+    lock_dictionary_name: kong_locks
+    namespace: Il2m5oYJQBRc8K7V5hukmjqP0zg8Kv2z
+    path: null
+    redis:
+      cluster_addresses: null
+      cluster_max_redirections: 5
+      cluster_nodes: null
+      connect_timeout: 2000
+      connection_is_proxied: false
+      database: 0
+      host: 127.0.0.1
+      keepalive_backlog: null
+      keepalive_pool_size: 256
+      password: null
+      port: 6379
+      read_timeout: 2000
+      redis_proxy_type: null
+      send_timeout: 2000
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_nodes: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: null
+    window_size:
+    - 30
+    window_type: fixed
+  enabled: true
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: details.bookinfo
+  name: details-service
+  path: /
+  plugins:
+  - config:
+      cache_control: false
+      cache_ttl: 300
+      content_type:
+      - text/plain
+      - application/json
+      ignore_uri_case: false
+      memory:
+        dictionary_name: kong_db_cache
+      request_method:
+      - GET
+      - HEAD
+      response_code:
+      - 200
+      - 301
+      - 404
+      response_headers:
+        X-Cache-Key: true
+        X-Cache-Status: true
+        age: true
+      storage_ttl: null
+      strategy: memory
+      vary_headers: null
+      vary_query_params: null
+    enabled: true
+    instance_name: details
+    name: proxy-cache
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 9080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: details-route
+    path_handling: v0
+    paths:
+    - ~/details
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.org
+  name: httpbin
+  path: /
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: httpbin_get
+    path_handling: v0
+    paths:
+    - ~/get$
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - latest
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: httpbin_post
+    path_handling: v0
+    paths:
+    - ~/post$
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - latest
+  tags:
+  - latest
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: ratings.bookinfo
+  name: ratings-service
+  path: /
+  plugins:
+  - config:
+      cache_control: false
+      cache_ttl: 300
+      content_type:
+      - text/plain
+      - application/json
+      ignore_uri_case: false
+      memory:
+        dictionary_name: kong_db_cache
+      request_method:
+      - GET
+      - HEAD
+      response_code:
+      - 200
+      - 301
+      - 404
+      response_headers:
+        X-Cache-Key: true
+        X-Cache-Status: true
+        age: true
+      storage_ttl: null
+      strategy: memory
+      vary_headers: null
+      vary_query_params: null
+    enabled: true
+    instance_name: ratings
+    name: proxy-cache
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 9080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: ratings-route
+    path_handling: v0
+    paths:
+    - ~/ratings
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: reviews.bookinfo
+  name: reviews-service
+  path: /
+  plugins:
+  - config:
+      cache_control: false
+      cache_ttl: 300
+      content_type:
+      - text/plain
+      - application/json
+      ignore_uri_case: false
+      memory:
+        dictionary_name: kong_db_cache
+      request_method:
+      - GET
+      - HEAD
+      response_code:
+      - 200
+      - 301
+      - 404
+      response_headers:
+        X-Cache-Key: true
+        X-Cache-Status: true
+        age: true
+      storage_ttl: null
+      strategy: memory
+      vary_headers: null
+      vary_query_params: null
+    enabled: true
+    instance_name: reviews
+    name: proxy-cache
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 9080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: reviews-service
+    path_handling: v0
+    paths:
+    - ~/reviews
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

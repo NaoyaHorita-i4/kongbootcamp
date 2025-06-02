@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - linux/arm64
+          - linux/arm64 # k8sクラスタのCPUアーキテクチャに合わせる
 
     steps:
     - name: Set up Docker Buildx
@@ -24,10 +24,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Pull Docker image
-      run: docker pull kong/kong-gateway:3.10.0.2-20250520-ubuntu
+      run: docker pull kong/kong-gateway:3.10.0.2-20250520-ubuntu # OSS版ではなくKongのEnterpriseイメージを選択
 
     - name: Log in to GHCR
-      run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin
+      run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u naoyahorita-i4 --password-stdin # 事前にGitHubでPAT作成
 
     - name: Tag Docker image
       run: docker tag kong/kong-gateway:3.10.0.2-20250520-ubuntu ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu
@@ -42,7 +42,7 @@ jobs:
         wget -O trivy_latest.deb https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.62.1_Linux-ARM64.deb
         sudo dpkg -i trivy_latest.deb
 
-    - name: Run Trivy scan
+    - name: Run Trivy scan # 脆弱性スキャン
       id: trivy
       run: |
         trivy image --quiet --severity HIGH,CRITICAL ghcr.io/naoyahorita-i4/kong:3.10.0.2-20250520-ubuntu > trivy_report.txt
