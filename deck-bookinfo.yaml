@@ -1,0 +1,29 @@
+_format_version: "3.0"
+services:
+  - host: details.bookinfo
+    name: details-service
+    path: /
+    port: 9080
+    protocol: http
+    routes:
+      - name: details-route
+        paths:
+          - ~/details
+  - host: ratings.bookinfo
+    name: ratings-service
+    path: /
+    port: 9080
+    protocol: http
+    routes:
+      - name: ratings-route
+        paths:
+          - ~/ratings
+  - host: reviews.bookinfo
+    name: reviews-service
+    path: /
+    port: 9080
+    protocol: http
+    routes:
+      - name: reviews-service
+        paths:
+          - ~/reviews
