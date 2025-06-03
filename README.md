@@ -137,6 +137,9 @@ http://prometheus.74-225-133-33.nip.io/ <br>
 https://grafana.74-225-133-33.nip.io/login <br>
 ※Grafanaはadmin/prom-operatorでログイン可能。
 
+Kongのダッシュボードは以下から取得可能。
+https://grafana.com/grafana/dashboards/7424-kong-official/
+
 4. productpageにアクセスを繰り返すと、メトリクスが取得できていることを確認できる。
 
 # 監査ログの取得
