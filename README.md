@@ -9,17 +9,6 @@
 [5. 監査ログの取得](#監査ログの取得)<br>
 [6. APIOpsの実装](#APIOpsの実装)<br>
 
-12. メトリクス、Konnectの監査ログの取得、ngrokへの転送
-以下に従ってメトリクスをPrometheusで取得できるようにする。
-https://qiita.com/ipppppei/items/04046dc6362b51d98d15
-kong_nginx_requests_totalで検索をかけるとメトリクスが見れる。
-
-ngrokは使用せず、AKS上に監査ログ保管用エンドポイント、及び監査ログを標準出力するpythonアプリをpodとして起動することで、監査ログを確認する。
-https://miro.com/app/board/uXjVI49P4Us=/?moveToWidget=3458764629947658993&cot=14
-
-13. APIOpsの実装
-14. 初期ユースケースの要件を満たしているか確認
-
 # 事前準備
 1. Kubernetesクラスタの用意
 2. k8sクラスタ、Konnectへ接続可能な端末で各種ツールのインストール
