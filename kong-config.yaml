@@ -86,6 +86,30 @@ services:
   path: /
   plugins:
   - config:
+      anonymous: null
+      hide_credentials: false
+      identity_realms:
+      - id: null
+        region: null
+        scope: cp
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: false
+    instance_name: keyAuth_details
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    - ws
+    - wss
+  - config:
       cache_control: false
       cache_ttl: 300
       content_type:
@@ -190,6 +214,30 @@ services:
   path: /
   plugins:
   - config:
+      anonymous: null
+      hide_credentials: false
+      identity_realms:
+      - id: null
+        region: null
+        scope: cp
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: false
+    instance_name: keyAuth_ratings
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    - ws
+    - wss
+  - config:
       cache_control: false
       cache_ttl: 300
       content_type:
@@ -246,6 +294,30 @@ services:
   name: reviews-service
   path: /
   plugins:
+  - config:
+      anonymous: null
+      hide_credentials: false
+      identity_realms:
+      - id: null
+        region: null
+        scope: cp
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: false
+    instance_name: keyAuth_reviews
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    - ws
+    - wss
   - config:
       cache_control: false
       cache_ttl: 300
