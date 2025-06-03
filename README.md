@@ -4,17 +4,10 @@
 [0. 事前準備](#事前準備)<br>
 [1. ゴールデンイメージの作成](#ゴールデンイメージの作成)<br>
 [2. Dataplaneの起動と設定反映](#Dataplaneの起動と設定反映)<br>
-3. BookInfoアプリのデプロイ
-4. お試しでService/Routeの作成
-7. ゴールデンイメージの準備
-8. trivyでscan
-9. github container registryにpush
-5. WebIDE→KongDP→BookInfoアプリの接続確認
-6. プラグイン実装
-10. Dataplaneの起動までのIaC化
-11. Prometheus/Grafanaのデプロイ
-以下に従ってコマンド実行していけばOK。ただし、グローバルIPアドレスを自身で用意したものに変更すること。
-https://qiita.com/ipppppei/items/c15acc5c7f7af3e7c289
+[3. BookInfoアプリのデプロイ](#BookInfoアプリのデプロイ)<br>
+[4. Prometheus/Grafanaのデプロイ](#Prometheus/Grafanaのデプロイ)<br>
+[5. 監査ログの取得](#監査ログの取得)<br>
+[6. APIOpsの実装](#APIOpsの実装)<br>
 
 12. メトリクス、Konnectの監査ログの取得、ngrokへの転送
 以下に従ってメトリクスをPrometheusで取得できるようにする。
@@ -84,79 +77,107 @@ deck --konnect-addr https://us.api.konghq.com \
 ```
 ※.deck.yamlに設定を保存しておくと便利。
 
-# command list
+# BookInfoアプリのデプロイ
+1. https://github.com/imurata/bookinfo/platform/kube/bookinfo.yaml
+をベースにして、details,ratings,reviews宛のリクエストをKong Gatewayに転送するようにproductpageのDeploymentを修正する。
+（./bookinfo.yaml 参照）
+
+2. yamlをapply
 ```
-coder@code-server:~$ pwd
-/home/coder
-```
-
-
-
-
-DPのIPアドレスを確認
-
-```
-coder@code-server:~$ kubectl get service my-kong-kong-proxy -n kong
-NAME                 TYPE           CLUSTER-IP   EXTERNAL-IP      PORT(S)                      AGE
-my-kong-kong-proxy   LoadBalancer   10.0.72.22   74.225.152.186   80:30477/TCP,443:30101/TCP   11m
+kubectl apply -f bookinfo.yaml -n kong
 ```
 
-
-Bookinfo.yamlのデプロイ
-※yamlにenvを設定することで、productpageからのリクエストをKongに流すことができる。
-
+3. Bookinfoアプリをインターネット公開
+Ingressを作成してグローバルIPアドレスで公開する。（./bookIngress.yaml 参照）
 ```
-coder@code-server:~$ kubectl apply -f bookinfo.yaml -n kong
-service/details created
-serviceaccount/bookinfo-details created
-deployment.apps/details-v1 created
-service/ratings created
-serviceaccount/bookinfo-ratings created
-deployment.apps/ratings-v1 created
-service/reviews created
-serviceaccount/bookinfo-reviews created
-deployment.apps/reviews-v1 created
-deployment.apps/reviews-v2 created
-deployment.apps/reviews-v3 created
-service/productpage created
-serviceaccount/bookinfo-productpage created
-deployment.apps/productpage-v1 created
-```
+helm repo add bitnami https://charts.bitnami.com/bitnami
 
+helm install contour bitnami/contour --namespace projectcontour --create-namespace
 
-bookinfo用のIngressを作る
-```
 kubectl apply -f ./bookIngress.yaml -n bookinfo
 ```
 
-ブラウザで以下にアクセスするとbookinfoのWeb画面が見れる。
+4. ブラウザで接続確認<br>
 http://productpage.74-225-133-33.nip.io/productpage
 
-kubectl scale --replicas=0 deployment/details-v1 -n bookinfo
+# Prometheus/Grafanaのデプロイ
+以下のリンクを参考にcert-managerとPromethes Operatorをインストールする。<br>
+https://qiita.com/ipppppei/items/c15acc5c7f7af3e7c289
 
+1. cert-managerのインストール
+```
+helm repo add jetstack https://charts.jetstack.io --force-update
 
+helm repo update
 
+helm install cert-manager jetstack/cert-manager --namespace cert-manager  --create-namespace --set installCRDs=true
 
+# 確認
+kubectl get all -n cert-manager
 
-audit-logs関連のリソースを作成
+kubectl api-resources |grep cert-manager
+```
+
+2. Promethes Operatorのインストール
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+helm repo update
+
+helm show values prometheus-community/kube-prometheus-stack > prom-values.yaml
+```
+AlertManager、Prometheus、Grafanaについてvalues.yamlに変更を加える。<br>
+※./prom-values.yamlと./prom-values_original.yamlで差分確認可能。<br>
+prom-values.yaml中の公開グローバルIPアドレスは、Bookinfoアプリ公開時に作成したIngressのIPアドレスに変更すること。<br>
+
+変更したvalues.yamlを用いてPrometheus/Grafanaをデプロイ。
+```
+helm upgrade -i -f prom-values.yaml prometheus-stack prometheus-community/kube-prometheus-stack -n prometheus-stack --create-namespace
+
+# 確認
+kubectl get ing -n prometheus-stack
+
+kubectl get issuer,certificate -n prometheus-stack
+
+kubectl get secret -n prometheus-stack |grep general
+
+kubectl get secret -n prometheus-stack prometheus-general-tls -o jsonpath={.data.'ca\.crt'}  | base64 -d | openssl x509 -noout -text | grep -A 1 "Subject Alternative Name"
+```
+
+3. ブラウザで確認<br>
+http://prometheus.74-225-133-33.nip.io/ <br>
+https://grafana.74-225-133-33.nip.io/login <br>
+※Grafanaはadmin/prom-operatorでログイン可能。
+
+4. productpageにアクセスを繰り返すと、メトリクスが取得できていることを確認できる。
+
+# 監査ログの取得
+1. audit-logsアプリケーション関連のリソースを作成
 ```
 kubectl apply -f auditlogs-pod.yaml
-kubectl apply -f auditlogs-cm.yaml
-kubectl get ing -n audit-logs
-kubectl get pod -n audit-logs
-```
 
-audit-logs宛にAPIリクエストが発生した場合、以下でログを確認できる。
-```
+kubectl apply -f auditlogs-cm.yaml
+
+kubectl get ing -n audit-logs
+
+kubectl get pod -n audit-logs
+
 kubectl logs webhook-server -n audit-logs -f
 ```
 
-Konnect側の監査ログ取得セットアップ
+
+2. Konnectで監査ログのセットアップ
 -  Organization　→ Audit Logs Setup →　Konnectタブ
 - Endpoint：http://webhook.74-225-133-33.nip.io/
-- Authorization Header：Bearer hoge # audit-logsはデモ用で認証かけていないのでダミーの値でOK。
+  - ※グローバルIPアドレスは各自の設定に変更すること。
+- Authorization Header：Bearer hoge
+  - ※audit-logsはデモ用で認証かけていないのでダミーの値でOK。
 - Log Format：Json
 - View Advanced Fields　→　Disable SSL Verification (Do not recommend)を有効にする。
 - disableをenableに変更。
 - Save
 - SatusでActice、200、timeを確認。
+
+# APIOpsの実装
+以下のリポジトリのREADME及び./github/workflowsを参照。<br>
+https://github.com/NaoyaHorita-i4/konnect-apiops-template/tree/main
