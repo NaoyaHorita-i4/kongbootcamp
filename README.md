@@ -64,7 +64,6 @@ deck --konnect-addr https://us.api.konghq.com \
   --konnect-token ${KONNECT_PAT} \
   gateway sync kong-config.yaml
 ```
-※.deck.yamlに設定を保存しておくと便利。
 
 # BookInfoアプリのデプロイ
 1. https://github.com/imurata/bookinfo/platform/kube/bookinfo.yaml
